@@ -1,0 +1,280 @@
+function main() { //Основная функция
+  
+ //************************************************ 
+  
+ //первая функция
+ //---- 1 ----// 
+ function gPl_1() //Эта функция добавляет исключения в группы на основе домена и статистики
+  
+  {
+    
+    var dN =['777','1000','2048','aforizm','android','anekdot','apk','astro','barbie','book','chords','citat','dating','dendy','dom2','dota','download','epub','fb2','ferma','film','flash','gadani','game','goroskop','igri','igry','kino','knig','mafia','mario','minecraft','minusovk','mods','movie','mp3','pdf','pesni','play','radio','recept','recipe','referat','resheb','sega','simulat','skyrim','spintires','spongebob','torrent','video','weather','zodiak','zuma','.xyz','80ahd3advhdf','alawar','android','anekdot','anime','anonymous','apps','arcade','arma','avatar','b1amglv','bablo','bakugan','barbie','ben10','book','dengi','detey','detsk','dieta','dom2','dota','download','flash','free','game','gdz','gta','gta','igra','igri','ironman','karaoke','knigi','minecraft','mods','mult','muzon','naruto','porn','referat','sims','song','student','tires','video','warcraft','weather','winks','xxx'];
+    
+    //набор символов, которые могут содержаться в доменах для отсева; кирилица и нек-е символы не поддерживаются 
+    
+    //Мобильные приложения и категории размещения мобильных приложений не поддерживаются adwords scripts
+    
+    var d="LAST_MONTH"; //период для анализа:
+    
+    //TODAY, YESTERDAY, LAST_7_DAYS, THIS_WEEK_SUN_TODAY, LAST_WEEK, LAST_14_DAYS, LAST_30_DAYS, LAST_BUSINESS_WEEK, LAST_WEEK_SUN_SAT, THIS_MONTH, LAST_MONTH, ALL_TIME, YYYYMMDD,YYYYMMDD
+    
+    var cN = "CampaignName CONTAINS 'KMS'"; // указать, какой набор символов содержит название кампании
+    
+    //сказать, что ярлыки не поддерживаются
+       
+  for (var i=0; i<dN.length;i++) { //цикл перебора списка доменов
+      
+    var pUC = "PlacementUrl CONTAINS "+dN[i]; //формирование условия для отсева
+      
+  var pS = AdWordsApp.display().placements()//отсев мест размещения по заданным условиям
+      
+    .withCondition(cN)//название кампании содержит
+    //.withCondition("AdGroupName CONTAINS 'Ремаркетинг'")//Имя группы содержит(можно и кирилицей);регистр имеет значение
+    .withCondition(pUC)//условие с именами доменов
+    .withCondition("Impressions != 0")//число показов
+    //.withCondition("ConvertedClicks < 1")//число кликов с конверсиями  ;написать, что получение баунс рейта дает ноль, а среднее время на сайте ничего не дает
+    .withCondition("Clicks > 1")//число кликов
+    //.withCondition("Cost < 1")//стоимость
+    //.withCondition("AverageCpc > 1.45")//средняя стоимость клика, если кликов не было, то равно нулю
+    //.withCondition("Ctr > 0.01")//значение CTR //сказать про .withLimit(50) 10 000 объектов
+    .forDateRange(d);//дата для отбора
+      
+  var pI = pS.get();//получаем то, что отсеяли
+    
+  while (pI.hasNext()) {//перебираем список площадок
+   
+      var p = pI.next();//для каждого места размещения
+      var pU = p.getUrl();//получаем url
+      var pG = p.getAdGroup().getName();//получаем имя группы
+      var pC = p.getCampaign().getName();//получаем имя кампании
+      var pGI = p.getAdGroup().getId();//получаем ID группы
+    
+      Logger.log(pC+' '+pGI+' '+pG+' '+pU);//выводим сообщение о том, что получили
+    
+  var adGroupSelector = AdWordsApp.adGroups()//перебираем группы в аккаунте
+     .withCondition(cN)//имя кампании содержит
+     .withIds([pGI])//ID группы содержит
+     .forDateRange(d)//за указанную дату
+ 
+  var adGroupIterator = adGroupSelector.get();//получаем группы
+    
+  while (adGroupIterator.hasNext()) {//перебираем группы
+     
+    var adGroup = adGroupIterator.next();//для каждой следующей группы
+ 
+    Logger.log("Из "+adGroup.getName()+" исключено "+pU);//выводим сообщение
+  
+  var placementBuilder = adGroup.display().newPlacementBuilder()//создаем новое место размещения
+     .withUrl(pU)//с указанным URL
+     .exclude()//исключаем площадку     
+  }
+  }     
+  }
+   if (pI<0) {Logger.log('');}
+    else {Logger.log('Ничего не найдено')}//Если ничего не нашлось, - появится сообщение
+  }//конец функции
+  
+  //************************************************
+  
+  //вторая функция
+  //---- 2 ----// 
+  function gPl_2() //Эта функция добавляет исключения в кампании на основе домена и статистики
+  
+  {
+    
+    var dN =['777','1000','2048','aforizm','android','anekdot','apk','astro','barbie','book','chords','citat','dating','dendy','dom2','dota','download','epub','fb2','ferma','film','flash','gadani','game','goroskop','igri','igry','kino','knig','mafia','mario','minecraft','minusovk','mods','movie','mp3','pdf','pesni','play','radio','recept','recipe','referat','resheb','sega','simulat','skyrim','spintires','spongebob','torrent','video','weather','zodiak','zuma','.xyz','80ahd3advhdf','alawar','android','anekdot','anime','anonymous','apps','arcade','arma','avatar','b1amglv','bablo','bakugan','barbie','ben10','book','dengi','detey','detsk','dieta','dom2','dota','download','flash','free','game','gdz','gta','gta','igra','igri','ironman','karaoke','knigi','minecraft','mods','mult','muzon','naruto','porn','referat','sims','song','student','tires','video','warcraft','weather','winks','xxx'];
+    
+    //набор символов, которые могут содержаться в доменах для отсева; кирилица и нек-е символы не поддерживаются 
+    
+    //Мобильные приложения и категории размещения мобильных приложений не поддерживаются adwords scripts
+    
+    var d="LAST_MONTH"; //период для анализа:
+    
+    //TODAY, YESTERDAY, LAST_7_DAYS, THIS_WEEK_SUN_TODAY, LAST_WEEK, LAST_14_DAYS, LAST_30_DAYS, LAST_BUSINESS_WEEK, LAST_WEEK_SUN_SAT, THIS_MONTH, LAST_MONTH, ALL_TIME, YYYYMMDD,YYYYMMDD
+    
+    var cN = "CampaignName CONTAINS 'KMS'"; // указать, какой набор символов содержит название кампании
+       
+  for (var i=0; i<dN.length;i++) { //цикл перебора списка доменов
+      
+    var pUC = "PlacementUrl CONTAINS "+dN[i]; //формирование условия для отсева
+      
+  var pS = AdWordsApp.display().placements()//отсев мест размещения по заданным условиям
+      
+    .withCondition(cN)//название кампании содержит
+    //.withCondition("AdGroupName CONTAINS 'Ремаркетинг'")//Имя группы содержит(можно и кирилицей);регистр имеет значение
+    .withCondition(pUC)//условие с именами доменов
+    .withCondition("Impressions != 0")//число показов
+    .withCondition("ConvertedClicks < 1")//число кликов с конверсиями  ;написать, что получение баунс рейта дает ноль, а среднее время на сайте ничего не дает
+    //.withCondition("Clicks <= 21")//число кликов
+    //.withCondition("Cost < 1")//стоимость
+    //.withCondition("AverageCpc > 1.45")//средняя стоимость клика, если кликов не было, то равно нулю
+    //.withCondition("Ctr > 0.01")//значение CTR //сказать про .withLimit(50) 10 000 объектов
+    .forDateRange(d);//дата для отбора
+      
+  var pI = pS.get();//получаем то, что отсеяли
+    
+  while (pI.hasNext()) {//перебираем список площадок
+   
+      var p = pI.next();//для каждого места размещения
+      var pU = p.getUrl();//получаем url
+      var pG = p.getAdGroup().getName();//получаем имя группы
+      var pC = p.getCampaign().getName();//получаем имя кампании
+      var pGI = p.getAdGroup().getId();//получаем ID группы
+    
+      Logger.log(pC+' '+pGI+' '+pG+' '+pU);//выводим сообщение о том, что получили
+    
+  var campaignSelector = AdWordsApp.campaigns()//перебираем кампании
+     .withCondition(cN)//имя кампании содержит
+     .forDateRange(d)//за указанную дату
+ 
+  var campaignIterator = campaignSelector.get();//получаем кампании
+    
+  while (campaignIterator.hasNext()) {//перебираем кампании
+     
+    var campaign = campaignIterator.next();//для каждой следующей кампании
+ 
+    Logger.log("Из "+campaign.getName()+" исключено "+pU);//выводим сообщение
+  
+  var placementBuilder = campaign.display().newPlacementBuilder()//создаем новое место размещения
+     .withUrl(pU)//с указанным URL
+     .exclude()//исключаем площадку     
+  }
+  }     
+  }
+   if (pI<0) {Logger.log('');}
+    else {Logger.log('Ничего не найдено')}//Если ничего не нашлось, - появится сообщение
+  }//конец функции
+  
+  //************************************************
+  
+  //третья функция
+  //---- 3 ----// 
+  function gPl_3() //Эта функция добавляет исключения в группы на основе статистики
+  
+  {
+    
+    //Мобильные приложения и категории размещения мобильных приложений не поддерживаются adwords scripts
+    
+    var d="LAST_30_DAYS"; //период для анализа:
+    
+    //TODAY, YESTERDAY, LAST_7_DAYS, THIS_WEEK_SUN_TODAY, LAST_WEEK, LAST_14_DAYS, LAST_30_DAYS, LAST_BUSINESS_WEEK, LAST_WEEK_SUN_SAT, THIS_MONTH, LAST_MONTH, ALL_TIME, YYYYMMDD,YYYYMMDD
+    
+    var cN = "CampaignName CONTAINS 'KMS'"; // указать, какой набор символов содержит название кампании  
+      
+  var pS = AdWordsApp.display().placements()//отсев мест размещения по заданным условиям
+      
+    .withCondition(cN)//название кампании содержит
+    //.withCondition("AdGroupName CONTAINS 'Ремаркетинг'")//Имя группы содержит(можно и кирилицей);регистр имеет значение
+    .withCondition("Impressions != 0")//число показов
+    //.withCondition("ConvertedClicks < 1")//число кликов с конверсиями  ;написать, что получение баунс рейта дает ноль, а среднее время на сайте ничего не дает
+    .withCondition("Clicks >1")//число кликов
+    //.withCondition("Cost < 1")//стоимость
+    .withCondition("AverageCpc > 5")//средняя стоимость клика, если кликов не было, то равно нулю
+    //.withCondition("Ctr > 0.01")//значение CTR //сказать про .withLimit(50) 10 000 объектов
+    .forDateRange(d);//дата для отбора
+      
+  var pI = pS.get();//получаем то, что отсеяли
+    
+  while (pI.hasNext()) {//перебираем список площадок
+   
+      var p = pI.next();//для каждого места размещения
+      var pU = p.getUrl();//получаем url
+      var pG = p.getAdGroup().getName();//получаем имя группы
+      var pC = p.getCampaign().getName();//получаем имя кампании
+      var pGI = p.getAdGroup().getId();//получаем ID группы
+    
+      Logger.log(pC+' '+pGI+' '+pG+' '+pU);//выводим сообщение о том, что получили
+    
+  var adGroupSelector = AdWordsApp.adGroups()//перебираем группы в аккаунте
+     .withCondition(cN)//имя кампании содержит
+     .withIds([pGI])//ID группы содержит
+     .forDateRange(d)//за указанную дату
+ 
+  var adGroupIterator = adGroupSelector.get();//получаем группы
+    
+  while (adGroupIterator.hasNext()) {//перебираем группы
+     
+    var adGroup = adGroupIterator.next();//для каждой следующей группы
+ 
+    Logger.log("Из "+adGroup.getName()+" исключено "+pU);//выводим сообщение
+  
+  var placementBuilder = adGroup.display().newPlacementBuilder()//создаем новое место размещения
+     .withUrl(pU)//с указанным URL
+     .exclude()//исключаем площадку     
+  }
+  }     
+   if (pI<0) {Logger.log('');}
+    else {Logger.log('Ничего не найдено')}//Если ничего не нашлось, - появится сообщение
+  }//конец функции
+  
+  //************************************************
+  
+  //четвертая функция
+  //---- 4 ----// 
+  function gPl_4() //Эта функция добавляет исключения в кампании на основе статистики
+  
+  {
+    
+    //Мобильные приложения и категории размещения мобильных приложений не поддерживаются adwords scripts
+    
+    var d="LAST_MONTH"; //период для анализа:
+    
+    //TODAY, YESTERDAY, LAST_7_DAYS, THIS_WEEK_SUN_TODAY, LAST_WEEK, LAST_14_DAYS, LAST_30_DAYS, LAST_BUSINESS_WEEK, LAST_WEEK_SUN_SAT, THIS_MONTH, LAST_MONTH, ALL_TIME, YYYYMMDD,YYYYMMDD
+    
+    var cN = "CampaignName CONTAINS 'KMS'"; // указать, какой набор символов содержит название кампании  
+      
+  var pS = AdWordsApp.display().placements()//отсев мест размещения по заданным условиям
+      
+    .withCondition(cN)//название кампании содержит
+    //.withCondition("AdGroupName CONTAINS 'Ремаркетинг'")//Имя группы содержит(можно и кирилицей);регистр имеет значение
+    .withCondition("Impressions != 0")//число показов
+    .withCondition("ConvertedClicks < 1")//число кликов с конверсиями  ;написать, что получение баунс рейта дает ноль, а среднее время на сайте ничего не дает
+    //.withCondition("Clicks <= 21")//число кликов
+    //.withCondition("Cost < 1")//стоимость
+    //.withCondition("AverageCpc > 1.45")//средняя стоимость клика, если кликов не было, то равно нулю
+    //.withCondition("Ctr > 0.01")//значение CTR //сказать про .withLimit(50) 10 000 объектов
+    .forDateRange(d);//дата для отбора
+      
+  var pI = pS.get();//получаем то, что отсеяли
+    
+  while (pI.hasNext()) {//перебираем список площадок
+   
+      var p = pI.next();//для каждого места размещения
+      var pU = p.getUrl();//получаем url
+      var pG = p.getAdGroup().getName();//получаем имя группы
+      var pC = p.getCampaign().getName();//получаем имя кампании
+      var pGI = p.getAdGroup().getId();//получаем ID группы
+    
+      Logger.log(pC+' '+pGI+' '+pG+' '+pU);//выводим сообщение о том, что получили
+    
+  var campaignSelector = AdWordsApp.campaigns()//перебираем кампании
+     .withCondition(cN)//имя кампании содержит
+     .forDateRange(d)//за указанную дату
+ 
+  var campaignIterator = campaignSelector.get();//получаем кампании
+    
+  while (campaignIterator.hasNext()) {//перебираем кампании
+     
+    var campaign = campaignIterator.next();//для каждой следующей кампании
+ 
+    Logger.log("Из "+campaign.getName()+" исключено "+pU);//выводим сообщение
+  
+  var placementBuilder = campaign.display().newPlacementBuilder()//создаем новое место размещения
+     .withUrl(pU)//с указанным URL
+     .exclude()//исключаем площадку     
+  }
+  }     
+   if (pI<0) {Logger.log('');}
+    else {Logger.log('Ничего не найдено')}//Если ничего не нашлось, - появится сообщение
+  }//конец функции
+  
+  //************************************************
+  
+  //Чтобы запустить нужную функцию необходимо ее раскомментировать, а другие закомментировать
+  
+  //gPl_1();//Эта функция добавляет исключения в группы на основе домена и статистики
+  //gPl_2();//Эта функция добавляет исключения в кампании на основе домена и статистики
+  gPl_3();//Эта функция добавляет исключения в группы на основе статистики
+  //gPl_4();//Эта функция добавляет исключения в кампании на основе статистики
+  
+}
