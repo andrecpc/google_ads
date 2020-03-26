@@ -1,6 +1,8 @@
+/*
 My extended version of the script of this author
   ||  
   \/
+*/
 
 /****************************
 * Exclude Mobile App ad placements that perform poorly
